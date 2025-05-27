@@ -284,29 +284,6 @@ class TreeVisualizer:
         # Schedule a redraw
         self.schedule_redraw()
 
-    def clear_path_highlight(self):
-        """Clear the highlighted path."""
-        with self.path_lock:
-            # Reset both current path and accumulated highlights
-            self.current_path = []
-            self.highlighted_paths = set()
-        self.schedule_redraw()
-
-    def reset_visit_counts(self):
-        """Reset all visit counts to zero."""
-        with self.path_lock:
-            self.node_visit_counts = {}
-            if self.root:
-                self._reset_visit_counts_recursive(self.root)
-        self.schedule_redraw()
-
-    def _reset_visit_counts_recursive(self, node):
-        """Recursively reset visit counts for all nodes."""
-        self.node_visit_counts[id(node)] = 0
-        if hasattr(node, 'children') and node.children:
-            for child in node.children:
-                self._reset_visit_counts_recursive(child)
-
     def schedule_redraw(self):
         """Schedule a redraw to happen in the OpenGL thread."""
         self.needs_redraw = True
@@ -643,57 +620,12 @@ class TreeVisualizer:
         
         return min_x, max_x, min_y, max_y
 
-    def draw_scrollbar(self):
-        """Draw horizontal scrollbar."""
-        min_x, max_x, min_y, max_y = self.get_tree_bounds()
-        tree_width = max_x - min_x
-        
-        if tree_width <= self.screen_width:
-            return  # No need for scrollbar
-            
-        # Calculate scrollbar metrics
-        scrollbar_height = 15
-        scrollbar_y = 10
-        thumb_width = max(30, self.screen_width * self.screen_width / tree_width)
-        
-        # Calculate thumb position based on current scroll
-        scroll_range = tree_width - self.screen_width
-        if scroll_range > 0:
-            scroll_ratio = max(0, min(1, -self.scroll_x / scroll_range))
-            thumb_position = scroll_ratio * (self.screen_width - thumb_width)
-        else:
-            thumb_position = 0
-        
-        # Draw scrollbar background
-        glColor4f(0.3, 0.3, 0.3, 0.7)
-        glBegin(GL_QUADS)
-        glVertex2f(0, scrollbar_y)
-        glVertex2f(self.screen_width, scrollbar_y)
-        glVertex2f(self.screen_width, scrollbar_y + scrollbar_height)
-        glVertex2f(0, scrollbar_y + scrollbar_height)
-        glEnd()
-        
-        # Draw scrollbar thumb
-        glColor4f(0.6, 0.6, 0.6, 0.8)
-        glBegin(GL_QUADS)
-        glVertex2f(thumb_position, scrollbar_y)
-        glVertex2f(thumb_position + thumb_width, scrollbar_y)
-        glVertex2f(thumb_position + thumb_width, scrollbar_y + scrollbar_height)
-        glVertex2f(thumb_position, scrollbar_y + scrollbar_height)
-        glEnd()
-        
     def draw_help_text(self):
         """Draw help text for navigation."""
         glColor3f(1.0, 1.0, 1.0)
         help_text = [
             "Navigation Controls:",
-            "- Left/Right Arrows: Scroll horizontally",
-            "- Up/Down Arrows: Scroll vertically", 
-            "- +/- Keys: Zoom in/out",
             "- Mouse Drag: Pan view",
-            "- C Key: Clear path highlights",
-            "- R Key: Reset visit counts",
-            "- ESC: Exit",
             "",
             "Node Coloring:",
             "- Blue/Yellow/Purple: Random assignment",
@@ -718,75 +650,12 @@ class TreeVisualizer:
             # Draw the tree
             self.draw_tree()
             
-            # Draw scrollbar
-            self.draw_scrollbar()
-            
             # Draw help text
             self.draw_help_text()
             
         glutSwapBuffers()
-        
-    def reshape(self, width, height):
-        """Handle window resizing."""
-        self.screen_width = width
-        self.screen_height = height
-        glViewport(0, 0, width, height)
-        glMatrixMode(GL_PROJECTION)
-        glLoadIdentity()
-        gluOrtho2D(0, width, 0, height)
-        
-    def keyboard(self, key, x, y):
-        """Handle keyboard input."""
-        if key == b'\x1b':  # ESC key
-            sys.exit(0)
-        elif key == b'+' or key == b'=':
-            self.zoom = min(self.zoom + self.zoom_factor, self.max_zoom_in)
-            # Recalculate positions for new zoom level
-            self.calculate_node_positions()
-        elif key == b'-' or key == b'_':
-            self.zoom = max(self.zoom - self.zoom_factor, self.max_zoom_out)
-            # Recalculate positions for new zoom level
-            self.calculate_node_positions()
-        elif key == b'c' or key == b'C':
-            # Clear path highlighting
-            self.clear_path_highlight()
-        elif key == b'r' or key == b'R':
-            # Reset visit counts
-            self.reset_visit_counts()
-        glutPostRedisplay()
-        
-    def special_key(self, key, x, y):
-        """Handle special keys."""
-        if key == GLUT_KEY_LEFT:
-            self.scroll_x += self.scroll_speed
-        elif key == GLUT_KEY_RIGHT:
-            self.scroll_x -= self.scroll_speed
-        elif key == GLUT_KEY_UP:
-            self.scroll_y -= self.scroll_speed
-        elif key == GLUT_KEY_DOWN:
-            self.scroll_y += self.scroll_speed
-        
-        # Limit scrolling based on tree bounds
-        min_x, max_x, min_y, max_y = self.get_tree_bounds()
-        tree_width = max_x - min_x
-        tree_height = max_y - min_y
-        
-        # Horizontal scroll limits
-        if tree_width > self.screen_width:
-            max_scroll_x = tree_width - self.screen_width
-            self.scroll_x = max(-max_scroll_x, min(0, self.scroll_x))
-        else:
-            self.scroll_x = max(-100, min(100, self.scroll_x))
-            
-        # Vertical scroll limits  
-        if tree_height > self.screen_height:
-            max_scroll_y = tree_height - self.screen_height
-            self.scroll_y = max(-max_scroll_y, min(0, self.scroll_y))
-        else:
-            self.scroll_y = max(-100, min(100, self.scroll_y))
-        
-        glutPostRedisplay()
-        
+
+
     def mouse(self, button, state, x, y):
         """Handle mouse input."""
         if button == GLUT_LEFT_BUTTON:
@@ -835,9 +704,6 @@ class TreeVisualizer:
         
         # Register callbacks
         glutDisplayFunc(self.display)
-        glutReshapeFunc(self.reshape)
-        glutKeyboardFunc(self.keyboard)
-        glutSpecialFunc(self.special_key)
         glutMouseFunc(self.mouse)
         glutMotionFunc(self.motion)
         glutIdleFunc(self.idle)  # Add idle function for auto-redraw
@@ -867,12 +733,7 @@ def highlight_path_for_data_line(data_values, column_names):
     if _global_visualizer:
         _global_visualizer.highlight_path_for_data(data_values, column_names)
 
-def clear_path_highlight():
-    """External function to clear path highlighting."""
-    global _global_visualizer
-    if _global_visualizer:
-        _global_visualizer.clear_path_highlight()
-    
+
 # If this file is run directly, demonstrate with a sample tree
 if __name__ == "__main__":
     from anytree import Node

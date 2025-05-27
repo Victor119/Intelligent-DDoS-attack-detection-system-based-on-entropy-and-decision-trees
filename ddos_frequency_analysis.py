@@ -14,7 +14,7 @@ from anytree.exporter import UniqueDotExporter
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
-from tree_visualizer import visualize_binary_tree, highlight_path_for_data_line, clear_path_highlight
+from tree_visualizer import visualize_binary_tree, highlight_path_for_data_line
 
 def calculate_entropy(a, b):
     n = a
