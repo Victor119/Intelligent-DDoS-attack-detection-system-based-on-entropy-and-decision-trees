@@ -96,7 +96,6 @@ class TreeVisualizer:
 
     def set_tree(self, root_node):
         self.root = root_node
-        self.tree_height = self.calculate_tree_height(self.root)
         self.calculate_node_positions()
         self.initialize_node_colors()
 
@@ -233,8 +232,6 @@ class TreeVisualizer:
                         if attribute in data_dict:
                             data_value = data_dict[attribute]
                             
-                            #print(f"DEBUG: Comparing {attribute}: {data_value} with threshold {threshold}")
-                            
                             # Decide which child to follow
                             if isinstance(data_value, (int, float)) and isinstance(threshold, (int, float)):
                                 if data_value <= threshold:
@@ -319,18 +316,6 @@ class TreeVisualizer:
         if not hasattr(node, 'children') or not node.children:
             return 1
         return sum(self.count_leaves(child) for child in node.children)
-
-    def calculate_tree_height(self, node, level=0):
-        """Calculate the height of the tree."""
-        if not hasattr(node, 'children') or not node.children:
-            return level + 1
-        return max(self.calculate_tree_height(child, level + 1) for child in node.children)
-
-    def calculate_subtree_width(self, node):
-        """Calculate the width needed for a subtree based on leaf count."""
-        leaf_count = self.count_leaves(node)
-        # Each leaf needs at least min_node_distance space
-        return max(leaf_count * self.min_node_distance, self.node_width)
 
     def calculate_node_positions(self):
         """Calculate positions for all nodes to prevent overlap."""
@@ -607,19 +592,6 @@ class TreeVisualizer:
             for child in node.children:
                 self._draw_nodes(child)
 
-    def get_tree_bounds(self):
-        """Get the bounding box of the tree."""
-        if not self.node_positions:
-            return 0, 0, 0, 0
-            
-        positions = list(self.node_positions.values())
-        min_x = min(pos[0] for pos in positions) - self.node_radius * 2
-        max_x = max(pos[0] for pos in positions) + self.node_radius * 2
-        min_y = min(pos[1] for pos in positions) - self.node_radius * 2
-        max_y = max(pos[1] for pos in positions) + self.node_radius * 2
-        
-        return min_x, max_x, min_y, max_y
-
     def draw_help_text(self):
         """Draw help text for navigation."""
         glColor3f(1.0, 1.0, 1.0)
@@ -654,7 +626,6 @@ class TreeVisualizer:
             self.draw_help_text()
             
         glutSwapBuffers()
-
 
     def mouse(self, button, state, x, y):
         """Handle mouse input."""
