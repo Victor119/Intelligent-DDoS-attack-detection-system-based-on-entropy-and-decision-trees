@@ -307,7 +307,8 @@ class TreeVisualizer:
                 self.font = GLUT_BITMAP_8_BY_13
             except:
                 try:
-                    self.font = glutBitmapHelvetica12
+                    from OpenGL.GLUT import GLUT_BITMAP_HELVETICA_12
+                    self.font = GLUT_BITMAP_HELVETICA_12
                 except:
                     self.font = 7
 
