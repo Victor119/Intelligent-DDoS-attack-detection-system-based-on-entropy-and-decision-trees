@@ -287,7 +287,7 @@ class DataFileHandler(FileSystemEventHandler):
 
 def monitor_logs_folder(logs_dir, column_names):
     """
-    Monitorizează folderul logs pentru fișiere .data noi
+    Monitorizeaza folderul logs pentru fisiere .data noi
     """
     # Set pentru a ține evidenta fișierelor deja procesate
     processed_files = set()
