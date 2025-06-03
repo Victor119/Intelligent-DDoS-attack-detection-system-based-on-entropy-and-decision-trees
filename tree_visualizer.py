@@ -1041,11 +1041,7 @@ class TreeVisualizer:
         self.screen_width = width
         self.screen_height = height
         glViewport(0, 0, width, height)
-        glMatrixMode(GL_PROJECTION)
-        glLoadIdentity()
         glOrtho(0, width, 0, height, -1, 1)
-        glMatrixMode(GL_MODELVIEW)
-        glLoadIdentity()
         
         # Recalculate positions for new window size
         self.calculate_node_positions()
