@@ -8,17 +8,17 @@ import random
 class TreeVisualizer:
     
     def __init__(self, screen_width=1200, screen_height=700, bg_color=(0.2, 0.2, 0.2, 1.0)):
-        """Initialize the TreeVisualizer cu setări îmbunătățite pentru distanțe foarte reduse.""" 
+        """Initialize the TreeVisualizer""" 
         self.screen_width = screen_width
         self.screen_height = screen_height
         self.bg_color = bg_color
         self.root = None
         
-        # Node size and spacing parameters - distanțe foarte reduse pentru compactitate maximă
-        self.node_radius = 18          # REDUS: de la 20 la 18
-        self.level_height = 60         # REDUS SEMNIFICATIV: de la 80 la 60
-        self.min_node_distance = 4     # REDUS: de la 6 la 4
-        self.node_width = 90           # REDUS: de la 100 la 90
+        # Node size and spacing parameters
+        self.node_radius = 18          
+        self.level_height = 60         
+        self.min_node_distance = 4     
+        self.node_width = 90           
         self.current_node = None
 
         # Camera/view control cu zoom extins
@@ -136,57 +136,57 @@ class TreeVisualizer:
                 self._initialize_node_properties(child)
 
     def get_adaptive_spacing(self):
-        """Calculate adaptive spacing între noduri cu prevenirea suprapunerii îmbunătățită și reducere la zoom out."""
-        # Distanța de bază foarte redusă
-        base_spacing = 4  # REDUS: de la 6 la 4
+        """Calculate adaptive spacing intre noduri cu prevenirea suprapunerii imbunatatita si reducere la zoom out."""
+        # Distanta de baza foarte redusa
+        base_spacing = 4
         
-        # Calculează dimensiunea medie a nodurilor pentru a preveni suprapunerea
+        # Calculeaza dimensiunea medie a nodurilor pentru a preveni suprapunerea
         if self.root and self.node_positions:
-            # Estimează dimensiunea nodului la zoom-ul curent
+            # Estimeaza dimensiunea nodului la zoom-ul curent
             sample_node_width = self.get_node_rect_width(self.root) * self.zoom
             sample_node_height = self.get_node_rect_height(self.root) * self.zoom
             
-            # Distanța minimă necesară pentru a evita suprapunerea
+            # Distanta minima necesara pentru a evita suprapunerea
             min_required_spacing = max(sample_node_width * 0.05, sample_node_height * 0.05, 2)  # REDUS
         else:
-            min_required_spacing = 2  # REDUS de la 3
+            min_required_spacing = 2
         
-        # Adaptează spacing-ul în funcție de zoom cu prevenirea suprapunerii - mai agresiv la zoom out
+        # Adapteaza spacing-ul in functie de zoom cu prevenirea suprapunerii - mai agresiv la zoom out
         if self.zoom >= 1.0:
             spacing = max(base_spacing, min_required_spacing)
         elif self.zoom >= 0.8:
-            spacing = max(base_spacing * 1.1, min_required_spacing)  # 4.4 pixels - REDUS
+            spacing = max(base_spacing * 1.1, min_required_spacing)  
         elif self.zoom >= 0.6:
-            spacing = max(base_spacing * 1.2, min_required_spacing)  # 4.8 pixels - REDUS
+            spacing = max(base_spacing * 1.2, min_required_spacing)  
         elif self.zoom >= 0.4:
-            spacing = max(base_spacing * 1.3, min_required_spacing)  # 5.2 pixels - REDUS
+            spacing = max(base_spacing * 1.3, min_required_spacing) 
         elif self.zoom >= 0.3:
-            spacing = max(base_spacing * 1.4, min_required_spacing)  # 5.6 pixels - REDUS
+            spacing = max(base_spacing * 1.4, min_required_spacing)  
         elif self.zoom >= 0.2:
-            spacing = max(base_spacing * 1.5, min_required_spacing)  # 6 pixels - REDUS
+            spacing = max(base_spacing * 1.5, min_required_spacing)  
         elif self.zoom >= 0.15:
-            spacing = max(base_spacing * 1.6, min_required_spacing)  # 6.4 pixels - REDUS
+            spacing = max(base_spacing * 1.6, min_required_spacing)  
         elif self.zoom >= 0.08:
-            spacing = max(base_spacing * 1.8, min_required_spacing)  # 7.2 pixels - REDUS
+            spacing = max(base_spacing * 1.8, min_required_spacing)  
         else:
-            # La zoom foarte mic, spacing minim pentru compactitate extremă
-            spacing = max(base_spacing * 2.0, min_required_spacing)  # 8 pixels - FOARTE REDUS
+            # La zoom foarte mic, spacing minim pentru compactitate extrema
+            spacing = max(base_spacing * 2.0, min_required_spacing)  
         
         return spacing
 
     def get_adaptive_level_height(self):
-        """Calculează înălțimea adaptivă între niveluri cu prevenirea suprapunerii și reducere mai agresivă la zoom out."""
-        # Înălțimea de bază foarte redusă
-        base_level_height = 60  # REDUS: de la 80 la 60
+        """Calculeaza inaltimea adaptiva intre niveluri cu prevenirea suprapunerii si reducere mai agresiva la zoom out."""
+        # Inaltimea de baza
+        base_level_height = 60
         
-        # Calculează înălțimea necesară pentru a evita suprapunerea nodurilor
+        # Calculeaza inaltimea necesara pentru a evita suprapunerea nodurilor
         if self.root:
             sample_node_height = self.get_node_rect_height(self.root)
-            min_required_height = sample_node_height * 1.2  # Redus de la 1.4 la 1.2 pentru compactitate
+            min_required_height = sample_node_height * 1.2
         else:
             min_required_height = 30  # Redus de la 40
         
-        # La zoom mare, păstrează distanța redusă dar sigură
+        # La zoom mare, pastreaza distanta redusa dar sigura
         if self.zoom >= 1.0:
             return max(base_level_height, min_required_height)
         elif self.zoom >= 0.8:
@@ -204,12 +204,12 @@ class TreeVisualizer:
         elif self.zoom >= 0.05:
             return max(base_level_height * 0.35, min_required_height)  # 21 pixels - ULTRA REDUS
         else:
-            # La zoom foarte mic, distanță minimă pentru vizibilitate
+            # La zoom foarte mic, distanta minima pentru vizibilitate
             return max(base_level_height * 0.3, min_required_height)   # 18 pixels - MINIMAL
 
 
     def get_text_alpha(self):
-        """Calculate text alpha cu tranziții mai fine pentru zoom extins - NU afișează text sub zoom 1.00."""
+        """Calculate text alpha cu tranzitii mai fine pentru zoom extins - NU afiseaza text sub zoom 1.00."""
         if self.zoom >= 1.0:
             return 1.0  # Fully visible doar la zoom >= 1.0
         else:
@@ -235,13 +235,13 @@ class TreeVisualizer:
             return max_multiplier + (min_multiplier - max_multiplier) * progress
 
     def calculate_node_positions(self):
-        """Calculate positions for all nodes cu distanțe adaptive și înălțimi foarte reduse la zoom out."""
+        """Calculate positions for all nodes cu distante adaptive si inaltimi foarte reduse la zoom out."""
         if not self.root:
             return
         
         self.node_positions = {}
         
-        # First pass: calculate the width needed for each subtree cu distanțe adaptive
+        # First pass: calculate the width needed for each subtree cu distante adaptive
         subtree_widths = {}
         self._calculate_subtree_widths(self.root, subtree_widths)
         
@@ -250,7 +250,7 @@ class TreeVisualizer:
         start_x = 0
         start_y = self.screen_height - 100
         
-        # Înălțimea între niveluri FOARTE ADAPTIVĂ - se reduce semnificativ la zoom out
+        # Inaltimea intre niveluri FOARTE ADAPTIVA - se reduce semnificativ la zoom out
         adaptive_level_height = self.get_adaptive_level_height()
         
         self._assign_positions(self.root, start_x, start_y, root_width, subtree_widths, adaptive_level_height)
@@ -271,7 +271,7 @@ class TreeVisualizer:
                 self.node_positions[node_id] = (centered_x, y)
 
     def _assign_positions(self, node, x, y, available_width, subtree_widths, level_height, level=0):
-        """Assign actual positions to nodes cu spacing îmbunătățit și prevenirea suprapunerii."""
+        """Assign actual positions to nodes cu spacing imbunatatit si prevenirea suprapunerii."""
         node_id = id(node)
         
         if not hasattr(node, 'children') or not node.children:
@@ -286,21 +286,21 @@ class TreeVisualizer:
         # Position current node at center of available space
         self.node_positions[node_id] = (x + available_width / 2, y)
         
-        # Calculate positions for children cu spacing îmbunătățit
+        # Calculate positions for children cu spacing imbunatatit
         child_y = y - level_height
         current_x = x
         adaptive_distance = self.get_adaptive_spacing()
         
-        # Verifică dacă copiii se suprapun și ajustează dacă e necesar
+        # Verifica daca copiii se suprapun si ajusteaza daca e necesar
         total_children_width = sum(subtree_widths[id(child)] for child in children)
         total_spacing_needed = (num_children - 1) * adaptive_distance
         total_required_width = total_children_width + total_spacing_needed
         
-        # Dacă lățimea disponibilă este mai mică decât cea necesară, reduce spacing-ul inteligent
+        # Daca latimea disponibila este mai mica decat cea necesara reduce spacing-ul inteligent
         if total_required_width > available_width and num_children > 1:
-            # Calculează spacing-ul maxim posibil fără suprapunere
+            # Calculeaza spacing-ul maxim posibil fara suprapunere
             max_possible_spacing = (available_width - total_children_width) / (num_children - 1)
-            # Asigură un minimum absolut pentru prevenirea suprapunerii complete
+            # Asigura un minimum absolut pentru prevenirea suprapunerii complete
             adaptive_distance = max(max_possible_spacing, 1.5)  # Minimum 1.5 pixels spacing
         
         for i, child in enumerate(children):
@@ -351,18 +351,18 @@ class TreeVisualizer:
             return id(node) in self.highlighted_paths
     
     def get_adaptive_text(self, text, max_width_pixels, zoom_level):
-        """Adaptează textul în funcție de nivelul de zoom și lățimea disponibilă - fără puncte."""
+        """Adapteaza textul in functie de nivelul de zoom si latimea disponibila - fara puncte."""
         if not text:
             return ""
         
-        # Estimează lățimea unui caracter la zoom-ul curent (mai precis)
+        # Estimeaza latimea unui caracter la zoom-ul curent (mai precis)
         char_width = max(4 * zoom_level, 1.5)
         max_chars = int(max_width_pixels / char_width)
         
         if max_chars <= 0:
             return ""
         
-        # Scalare text în funcție de zoom - fără puncte
+        # Scalare text in functie de zoom - fara puncte
         if zoom_level >= 0.7:
             # Text complet la zoom mare
             if len(text) <= max_chars:
@@ -382,7 +382,7 @@ class TreeVisualizer:
             if len(text) <= max_chars:
                 return text
             else:
-                # Încearcă să păstreze partea importantă
+                # Incearca sa pastreze partea importanta
                 if "Class:" in text:
                     short_text = text.replace("Class:", "C:")
                     if len(short_text) <= max_chars:
@@ -390,7 +390,7 @@ class TreeVisualizer:
                     else:
                         return short_text[:max_chars]
                 elif "<=" in text:
-                    # Pentru condiții, păstrează partea principală
+                    # Pentru conditii pastreaza partea principala
                     feature_part = text.split("<=")[0].strip()
                     if len(feature_part) <= max_chars:
                         return feature_part
@@ -399,7 +399,7 @@ class TreeVisualizer:
                 else:
                     return text[:max_chars]
         elif zoom_level >= 0.1:
-            # Pentru zoom foarte mic, doar cuvinte cheie
+            # Pentru zoom foarte mic doar cuvinte cheie
             max_chars = min(max_chars, 10)
             if "Class:" in text:
                 class_part = text.replace("Class:", "").strip()
@@ -418,7 +418,7 @@ class TreeVisualizer:
                 else:
                     return text[:max_chars] if len(text) > 0 else ""
         else:
-            # Pentru zoom extrem de mic, doar inițiale
+            # Pentru zoom extrem de mic
             if max_chars >= 2:
                 if "Class:" in text:
                     class_name = text.replace("Class:", "").strip()
@@ -445,17 +445,17 @@ class TreeVisualizer:
         return text[:max_chars] if text else ""
 
     def display_text_scaled(self, text, x, y, max_width, zoom_level):
-        """Display text scalat cu zoom-ul și limitare de lățime fără puncte și fără distanțare la zoom-in."""
+        """Display text scalat cu zoom-ul si limitare de latime fara puncte si fara distantare la zoom-in."""
         if not text or zoom_level < 0.02:
             return
         
-        # Adaptează textul să încapă în lățimea disponibilă
+        # Adapteaza textul sa incapa in latimea disponibila
         adapted_text = self.get_adaptive_text(text, max_width, zoom_level)
         if not adapted_text:
             return
         
-        # Calculează poziția exactă pentru a centra textul - folosește lățimea font-ului standard
-        estimated_text_width = len(adapted_text) * 6  # Lățime fixă standard pentru caracter
+        # Calculeaza pozitia exacta pentru a centra textul - foloseste latimea font-ului standard
+        estimated_text_width = len(adapted_text) * 6  # Latime fixa standard pentru caracter
         centered_x = x - estimated_text_width / 2
         
         glRasterPos2f(centered_x, y)
@@ -464,18 +464,18 @@ class TreeVisualizer:
             return
         
         try:
-            # Pentru zoom foarte mic, simulează font mai mic prin sărirea caracterelor
+            # Pentru zoom foarte mic, simuleaza font mai mic prin sarirea caracterelor
             if zoom_level < 0.08:
-                # Afișează doar fiecare al 2-lea sau 3-lea caracter pentru efect de "font mic"
+                # Afiseaza doar fiecare al 2-lea sau 3-lea caracter pentru efect de "font mic"
                 step = max(1, int(0.15 / max(zoom_level, 0.01)))
                 displayed_text = adapted_text[::step]
             elif zoom_level < 0.15:
-                # Afișează majoritatea caracterelor
+                # Afiseaza majoritatea caracterelor
                 displayed_text = adapted_text
             else:
                 displayed_text = adapted_text
             
-            # Afișează caracterele FĂRĂ spacing custom - lasă font-ul să gestioneze spacing-ul
+            # Afiseaza caracterele FARA spacing custom - lasa font-ul sa gestioneze spacing-ul
             for char in displayed_text:
                 glutBitmapCharacter(self.font, ord(char))
                 
@@ -483,7 +483,7 @@ class TreeVisualizer:
             pass
 
     def draw_node(self, node, x, y, highlighted=False):
-        """Draw a tree node cu text scalat - NU afișează text sub zoom 1.00."""
+        """Draw a tree node cu text scalat - NU afiseaza text sub zoom 1.00."""
         name = getattr(node, 'name', '')
         in_path = self.is_node_in_highlighted_path(node)
         text_alpha = self.get_text_alpha()
@@ -495,7 +495,7 @@ class TreeVisualizer:
             node_color = self.get_node_color(node)
             glColor3f(*node_color)
 
-        # Pregăteşte liniile de text
+        # Pregateste liniile de text
         lines = []
         if "<=" in name:    
             lines = [name]
@@ -504,17 +504,17 @@ class TreeVisualizer:
         else:
             lines = [name]
 
-        # Calculează dimensiunea dreptunghiului
+        # Calculeaza dimensiunea dreptunghiului
         rect_w = self.get_node_rect_width(node)
         rect_h = self.get_node_rect_height(node)
 
-        # Colţurile dreptunghiului
+        # Colturile dreptunghiului
         left   = x - rect_w/2
         right  = x + rect_w/2
         top    = y + rect_h/2
         bottom = y - rect_h/2
 
-        # Desenează dreptunghiul
+        # Deseneaza dreptunghiul
         glBegin(GL_POLYGON)
         glVertex2f(left,  top)
         glVertex2f(right, top)
@@ -522,7 +522,7 @@ class TreeVisualizer:
         glVertex2f(left,  bottom)
         glEnd()
 
-        # Contur cu grosime foarte redusă pentru compactitate
+        # Contur cu grosime foarte redusa pentru compactitate
         if in_path:
             glColor3f(1.0, 0.5, 0.0)
             glLineWidth(max(1.8 * self.get_line_width_multiplier(), 1.0))
@@ -543,40 +543,40 @@ class TreeVisualizer:
             text_color_with_alpha = (*self.text_color, text_alpha)
             glColor4f(*text_color_with_alpha)
             
-            # Calculează dimensiunea scalată a textului cu compactitate maximă
+            # Calculeaza dimensiunea scalata a textului cu compactitate maxima
             scaled_line_height = max(8 * self.zoom, 3)
             padding_y = max(1 * self.zoom, 0.3)
             padding_x = max(2 * self.zoom, 1)
             
-            # Lățimea disponibilă pentru text (cu padding strict)
+            # Latimea disponibila pentru text (cu padding strict)
             available_text_width = rect_w - 2 * padding_x
             
-            # Verifică că avem suficient spațiu pentru text
+            # Verifica ca avem suficient spatiu pentru text
             if available_text_width <= 2:
                 return
             
-            # Calculează numărul maxim de linii care încap
+            # Calculeaza numarul maxim de linii care incap
             available_height = rect_h - 2 * padding_y
             max_lines = max(1, int(available_height / scaled_line_height))
             
-            # Limitează numărul de linii afișate
+            # Limiteaza numarul de linii afisate
             display_lines = lines[:min(max_lines, 3)]
             
-            # Calculează poziția de start pentru centrarea verticală
+            # Calculeaza pozitia de start pentru centrarea verticala
             total_text_height = len(display_lines) * scaled_line_height
             start_y = y + (total_text_height / 2) - (scaled_line_height / 2)
             
             for idx, line in enumerate(display_lines):
                 y_offset = start_y - idx * scaled_line_height
                 
-                # Verifică boundurile verticale
+                # Verifica boundurile verticale
                 if y_offset < bottom + padding_y or y_offset > top - padding_y - scaled_line_height/2:
                     continue
                 
-                # Afișează textul scalat
+                # Afiseaza textul scalat
                 self.display_text_scaled(line, x, y_offset, available_text_width, self.zoom)
 
-            # Numărul de vizite sub nod - DOAR la zoom >= 1.0
+            # Numarul de vizite sub nod - DOAR la zoom >= 1.0
             if rect_h > 15:
                 node_id = id(node)
                 visit_count = self.node_visit_counts.get(node_id, 0)
@@ -584,13 +584,13 @@ class TreeVisualizer:
                     glColor4f(0.6, 0.6, 0.6, text_alpha * 0.8)
                     count_text = f"({visit_count})"
                     
-                    # Poziționează count-ul în partea de jos a nodului
+                    # Poziționeaza count-ul in partea de jos a nodului
                     count_y = bottom + padding_y + 2
                     
-                    # Verifică că count-ul încape în nod
+                    # Verifica ca count-ul incape in nod
                     if count_y < top - padding_y:
                         count_width = available_text_width * 0.6
-                        # Afișează count-ul
+                        # Afiseaza count-ul
                         self.display_text_scaled(count_text, x, count_y, count_width, self.zoom)
 
     def draw_line(self, x1, y1, x2, y2, is_path_line=False):
@@ -675,14 +675,14 @@ class TreeVisualizer:
 
     
     def get_text_alpha(self):
-        """Calculate text alpha cu tranziții mai fine pentru zoom extins - NU afișează text sub zoom 1.00."""
+        """Calculate text alpha cu tranzitii mai fine pentru zoom extins - NU afiseaza text sub zoom 1.00."""
         if self.zoom >= 1.0:
             return 1.0  # Fully visible doar la zoom >= 1.0
         else:
             return 0.0  # Complet invizibil sub zoom 1.0
 
     def draw_node(self, node, x, y, highlighted=False):
-        """Draw a tree node cu text scalat - NU afișează text sub zoom 1.00."""
+        """Draw a tree node cu text scalat - NU afiseaza text sub zoom 1.00."""
         name = getattr(node, 'name', '')
         in_path = self.is_node_in_highlighted_path(node)
         text_alpha = self.get_text_alpha()
@@ -694,7 +694,7 @@ class TreeVisualizer:
             node_color = self.get_node_color(node)
             glColor3f(*node_color)
 
-        # Pregăteşte liniile de text
+        # Pregateste liniile de text
         lines = []
         if "<=" in name:    
             lines = [name]
@@ -703,17 +703,17 @@ class TreeVisualizer:
         else:
             lines = [name]
 
-        # Calculează dimensiunea dreptunghiului
+        # Calculeaza dimensiunea dreptunghiului
         rect_w = self.get_node_rect_width(node)
         rect_h = self.get_node_rect_height(node)
 
-        # Colţurile dreptunghiului
+        # Colturile dreptunghiului
         left   = x - rect_w/2
         right  = x + rect_w/2
         top    = y + rect_h/2
         bottom = y - rect_h/2
 
-        # Desenează dreptunghiul
+        # Deseneaza dreptunghiul
         glBegin(GL_POLYGON)
         glVertex2f(left,  top)
         glVertex2f(right, top)
@@ -721,7 +721,7 @@ class TreeVisualizer:
         glVertex2f(left,  bottom)
         glEnd()
 
-        # Contur cu grosime foarte redusă pentru compactitate
+        # Contur cu grosime foarte redusa pentru compactitate
         if in_path:
             glColor3f(1.0, 0.5, 0.0)
             glLineWidth(max(1.8 * self.get_line_width_multiplier(), 1.0))
@@ -742,40 +742,40 @@ class TreeVisualizer:
             text_color_with_alpha = (*self.text_color, text_alpha)
             glColor4f(*text_color_with_alpha)
             
-            # Calculează dimensiunea scalată a textului cu compactitate maximă
+            # Calculeaza dimensiunea scalata a textului cu compactitate maxima
             scaled_line_height = max(8 * self.zoom, 3)
             padding_y = max(1 * self.zoom, 0.3)
             padding_x = max(2 * self.zoom, 1)
             
-            # Lățimea disponibilă pentru text (cu padding strict)
+            # Latimea disponibila pentru text (cu padding strict)
             available_text_width = rect_w - 2 * padding_x
             
-            # Verifică că avem suficient spațiu pentru text
+            # Verifica ca avem suficient spatiu pentru text
             if available_text_width <= 2:
                 return
             
-            # Calculează numărul maxim de linii care încap
+            # Calculeaza numarul maxim de linii care incap
             available_height = rect_h - 2 * padding_y
             max_lines = max(1, int(available_height / scaled_line_height))
             
-            # Limitează numărul de linii afișate
+            # Limiteaza numarul de linii afisate
             display_lines = lines[:min(max_lines, 3)]
             
-            # Calculează poziția de start pentru centrarea verticală
+            # Calculeaza pozitia de start pentru centrarea verticala
             total_text_height = len(display_lines) * scaled_line_height
             start_y = y + (total_text_height / 2) - (scaled_line_height / 2)
             
             for idx, line in enumerate(display_lines):
                 y_offset = start_y - idx * scaled_line_height
                 
-                # Verifică boundurile verticale
+                # Verifica boundurile verticale
                 if y_offset < bottom + padding_y or y_offset > top - padding_y - scaled_line_height/2:
                     continue
                 
-                # Afișează textul scalat
+                # Afiseaza textul scalat
                 self.display_text_scaled(line, x, y_offset, available_text_width, self.zoom)
 
-            # Numărul de vizite sub nod - DOAR la zoom >= 1.0
+            # Numarul de vizite sub nod - DOAR la zoom >= 1.0
             if rect_h > 15:
                 node_id = id(node)
                 visit_count = self.node_visit_counts.get(node_id, 0)
@@ -783,19 +783,19 @@ class TreeVisualizer:
                     glColor4f(0.6, 0.6, 0.6, text_alpha * 0.8)
                     count_text = f"({visit_count})"
                     
-                    # Poziționează count-ul în partea de jos a nodului
+                    # Pozitioneaza count-ul in partea de jos a nodului
                     count_y = bottom + padding_y + 2
                     
-                    # Verifică că count-ul încape în nod
+                    # Verifica ca count-ul incape in nod
                     if count_y < top - padding_y:
                         count_width = available_text_width * 0.6
-                        # Afișează count-ul
+                        # Afiseaza count-ul
                         self.display_text_scaled(count_text, x, count_y, count_width, self.zoom)
 
     def draw_help_text(self):
         """Draw help text for navigation - DOAR la zoom >= 1.0."""
         if self.zoom < 1.0:
-            return  # Nu afișa help text sub zoom 1.0
+            return  # Nu afisa help text sub zoom 1.0
             
         text_alpha = self.get_text_alpha()
         if text_alpha > 0.01:  # Only draw help text if visible
@@ -823,7 +823,7 @@ class TreeVisualizer:
                 y -= 15
 
     def _draw_nodes(self, node):
-        """Draw all nodes cu culling îmbunătățit pentru distanțe foarte reduse."""
+        """Draw all nodes cu culling imbunatatit pentru distanțe foarte reduse."""
         node_id = id(node)
         if node_id in self.node_positions:
             x, y = self.node_positions[node_id]
@@ -832,13 +832,13 @@ class TreeVisualizer:
             screen_x = x + self.scroll_x
             screen_y = y + self.scroll_y
             
-            # Culling îmbunătățit cu margini foarte reduse pentru compactitate
+            # Culling imbunatatit cu margini foarte reduse pentru compactitate
             node_width = self.get_node_rect_width(node)
             node_height = self.get_node_rect_height(node)
             
-            # Marge pentru culling foarte reduse pentru compactitate maximă
-            margin_x = max(node_width * 1.1, 20)   # Marjă foarte redusă
-            margin_y = max(node_height * 1.1, 20)  # Marjă foarte redusă
+            # Marge pentru culling foarte reduse pentru compactitate maxima
+            margin_x = max(node_width * 1.1, 20)   # Marja foarte redusa
+            margin_y = max(node_height * 1.1, 20)  # Marja foarte redusa
             
             if (screen_x > -margin_x and screen_x < self.screen_width + margin_x and
                 screen_y > -margin_y and screen_y < self.screen_height + margin_y):
@@ -852,19 +852,19 @@ class TreeVisualizer:
                 self._draw_nodes(child)
 
     def get_node_rect_height(self, node):
-        """Returnează înălțimea dreptunghiului pentru un nod, cu dimensiune minimă foarte redusă și prevenirea suprapunerii - îmbunătățit."""
+        """Returneaza inaltimea dreptunghiului pentru un nod cu dimensiune minima foarte redusa si prevenirea suprapunerii - imbunatatit."""
         name = getattr(node, 'name', '')
         lines = name.split('\n')
         
-        # Calculează înălțimea bazei fără zoom - parametri reduși și mai controlați
+        # Calculeaza inaltimea bazei fara zoom - parametri redusi si mai controlati
         base_line_height = 9   # REDUS: de la 10 la 9
         base_padding_y = 1.5   # REDUS: de la 2 la 1.5
         base_height = len(lines) * base_line_height + 2 * base_padding_y
         
-        # Scalează cu zoom-ul, dar cu o dimensiune minimă care previne suprapunerea
+        # Scaleaza cu zoom-ul, dar cu o dimensiune minima care previne suprapunerea
         scaled_height = base_height * self.zoom
         
-        # Dimensiune minimă în funcție de zoom cu prevenirea suprapunerii - mai controlată
+        # Dimensiune minima in functie de zoom cu prevenirea suprapunerii - mai controlata
         if self.zoom >= 0.6:
             min_height = 8   # REDUS: de la 6 la 8 pentru a avea loc pentru text
         elif self.zoom >= 0.4:
@@ -874,14 +874,14 @@ class TreeVisualizer:
         elif self.zoom >= 0.1:
             min_height = 5   # Structural visibility
         elif self.zoom >= 0.05:
-            min_height = 4   # Doar structură
+            min_height = 4   # Doar structura
         else:
             min_height = 3   # Minim absolut pentru vizibilitate
         
-        # Asigură-te că înălțimea este suficientă pentru a evita suprapunerea
+        # Asigura-te ca inaltimea este suficienta pentru a evita suprapunerea
         final_height = max(scaled_height, min_height)
         
-        # Pentru noduri cu text lung, asigură înălțime minimă suplimentară
+        # Pentru noduri cu text lung asigura inaltime minima suplimentara
         if len(name) > 20 and self.zoom > 0.3:
             final_height = max(final_height, 12)
         elif len(name) > 15 and self.zoom > 0.2:
@@ -890,20 +890,20 @@ class TreeVisualizer:
         return final_height
 
     def get_node_rect_width(self, node):
-        """Returnează lățimea dreptunghiului pentru un nod cu prevenirea suprapunerii îmbunătățită și spațiu pentru text."""
+        """Returneaza latimea dreptunghiului pentru un nod cu prevenirea suprapunerii imbunatatita si spatiu pentru text."""
         name = getattr(node, 'name', '')
         lines = name.split('\n')
         
-        # Calculează lățimea bazei fără zoom - parametri ajustați pentru text
+        # Calculeaza latimea bazei fara zoom - parametri ajustati pentru text
         base_padding_x = 3     # Padding suficient pentru text
-        base_char_width = 5    # Lățime caracter mai realistă
+        base_char_width = 5    # Latime caracter mai realista
         max_text_width = max(len(line) for line in lines) * base_char_width
         base_width = max(self.node_width * 0.6, max_text_width + 2 * base_padding_x)  # 60% din node_width
         
-        # Scalează cu zoom-ul
+        # Scaleaza cu zoom-ul
         scaled_width = base_width * self.zoom
         
-        # Dimensiune minimă în funcție de zoom cu spațiu pentru text
+        # Dimensiune minima in functie de zoom cu spatiu pentru text
         if self.zoom >= 0.6:
             min_width = 15   # Suficient pentru text complet
         elif self.zoom >= 0.4:
@@ -911,14 +911,14 @@ class TreeVisualizer:
         elif self.zoom >= 0.2:
             min_width = 10   # Text minimal
         elif self.zoom >= 0.1:
-            min_width = 8    # Inițiale
+            min_width = 8    # Initiale
         else:
             min_width = 6    # Structural only
         
-        # Asigură lățimea minimă pentru prevenirea suprapunerii
+        # Asigura latimea minima pentru prevenirea suprapunerii
         final_width = max(scaled_width, min_width)
         
-        # Pentru noduri cu text foarte lung, asigură lățime suplimentară
+        # Pentru noduri cu text foarte lung asigura latime suplimentara
         if len(name) > 25 and self.zoom > 0.4:
             final_width = max(final_width, len(name) * 2 + 10)
         elif len(name) > 20 and self.zoom > 0.3:
@@ -928,39 +928,39 @@ class TreeVisualizer:
 
 
     def _calculate_subtree_widths(self, node, widths):
-        """Calculează lățimile subtree-urilor cu distanțe foarte reduse și prevenirea suprapunerii."""
-        # Lățimea nodului curent
+        """Calculeaza latimile subtree-urilor cu distante foarte reduse si prevenirea suprapunerii."""
+        # Latimea nodului curent
         node_req_width = self.get_node_rect_width(node)
         
         if not hasattr(node, 'children') or not node.children:
             widths[id(node)] = node_req_width
             return node_req_width
 
-        # Internal node - sum of children widths plus spații foarte reduse
+        # Internal node - sum of children widths plus spatii foarte reduse
         total_width = 0
         for child in node.children:
             child_width = self._calculate_subtree_widths(child, widths)
             total_width += child_width
 
-        # Distanța între frați FOARTE REDUSĂ cu prevenirea suprapunerii
+        # Distanta intre frati FOARTE REDUSA cu prevenirea suprapunerii
         if len(node.children) > 1:
-            # Folosește distanța adaptivă foarte redusă
+            # Foloseste distanta adaptiva foarte redusa
             adaptive_distance = self.get_adaptive_spacing()
             
-            # Asigură-te că distanța nu este mai mică decât minimul necesar pentru zoom
+            # Asigura-te ca distanta nu este mai mica decat minimul necesar pentru zoom
             min_spacing_for_zoom = max(1.5, 3 * self.zoom)  # Scaling mai agresiv cu zoom-ul
             final_spacing = max(adaptive_distance, min_spacing_for_zoom)
             
             total_width += (len(node.children) - 1) * final_spacing
 
-        # Lățimea finală cu marjă minimă pentru compactitate maximă
-        final_width = max(total_width, node_req_width * 1.03)  # Marjă de doar 3%
+        # Latimea finala cu marja minima pentru compactitate maxima
+        final_width = max(total_width, node_req_width * 1.03)  # Marja de doar 3%
         
         widths[id(node)] = final_width
         return final_width
 
     def display_text(self, text, x, y):
-        """Display text at the given position fără prescurtare cu puncte și fără distanțare la zoom-in."""
+        """Display text at the given position"""
         scaled_x = x
         scaled_y = y
         
@@ -970,25 +970,25 @@ class TreeVisualizer:
             return
             
         try:
-            # Pentru textul general (help, zoom indicator), folosește adaptare fără puncte
+            # Pentru textul general (help, zoom indicator), foloseste adaptare fara puncte
             if self.zoom < 0.3:
-                # Prescurtează textul pentru zoom mic fără puncte
+                # Prescurteaza textul pentru zoom mic fara puncte
                 max_len = max(5, int(25 * self.zoom / 0.3))
                 display_text = text[:max_len] if len(text) > max_len else text
             else:
                 display_text = text
             
-            # Pentru zoom foarte mic, prescurtare mai agresivă
+            # Pentru zoom foarte mic, prescurtare mai agresiva
             if self.zoom < 0.15:
                 max_len = max(3, int(10 * self.zoom / 0.15))
                 display_text = display_text[:max_len] if len(display_text) > max_len else display_text
             
-            # Simulează font mai mic prin caractere mai rare la zoom mic
+            # Simuleaza font mai mic prin caractere mai rare la zoom mic
             if self.zoom < 0.1:
-                # Afișează doar fiecare al 2-lea caracter
+                # Afiseaza doar fiecare al 2-lea caracter
                 display_text = display_text[::2]
             
-            # Afișează textul FĂRĂ spacing manual - lasă font-ul să gestioneze spacing-ul
+            # Afiseaza textul FARA spacing manual - lasa font-ul sa gestioneze spacing-ul
             for char in display_text:
                 glutBitmapCharacter(self.font, ord(char))
         except:
@@ -1305,7 +1305,7 @@ class TreeVisualizer:
                     except ValueError:
                         pass
             
-            # If we couldn't parse the condition, just take the first child
+            # If we couldn't parse the condition just take the first child
             current = current.children[0]
             path.append(current)
             break
