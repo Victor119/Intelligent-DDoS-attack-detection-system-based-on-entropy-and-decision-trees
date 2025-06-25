@@ -486,52 +486,25 @@ class TreeVisualizer:
         # Calculate proportions
         ddos_ratio = distribution['ddos'] / total_leaves
         benign_ratio = distribution['benign'] / total_leaves
-        other_ratio = distribution['other'] / total_leaves
         
-        # Enhanced color mapping with more nuanced gradients
-        if ddos_ratio >= 0.9:
-            # Almost all DDOS - very dark red
-            return (0.9, 0.1, 0.1)
-        elif ddos_ratio >= 0.8:
-            # Predominantly DDOS (80%+) - dark red
-            return (0.8, 0.2, 0.1)
-        elif ddos_ratio >= 0.7:
-            # Mostly DDOS (70-80%) - medium red
-            return (0.9, 0.3, 0.2)
-        elif ddos_ratio >= 0.6:
-            # Somewhat DDOS (60-70%) - lighter red
-            return (0.9, 0.4, 0.3)
-        elif ddos_ratio >= 0.5:
-            # Slightly more DDOS (50-60%) - red-orange
-            return (0.9, 0.5, 0.3)
-        elif benign_ratio >= 0.9:
-            # Almost all benign - very dark green
-            return (0.1, 0.8, 0.1)
-        elif benign_ratio >= 0.8:
-            # Predominantly benign (80%+) - dark green
-            return (0.2, 0.7, 0.2)
-        elif benign_ratio >= 0.7:
-            # Mostly benign (70-80%) - medium green
-            return (0.3, 0.8, 0.3)
-        elif benign_ratio >= 0.6:
-            # Somewhat benign (60-70%) - lighter green
-            return (0.4, 0.8, 0.4)
-        elif benign_ratio >= 0.5:
-            # Slightly more benign (50-60%) - light green
-            return (0.5, 0.9, 0.4)
-        else:
-            # Mixed or balanced distributions
-            if ddos_ratio > benign_ratio:
-                # More DDOS than benign but not majority - orange
-                intensity = (ddos_ratio - benign_ratio) * 2  # Scale the difference
-                return (0.9, 0.6 - intensity * 0.2, 0.2)
-            elif benign_ratio > ddos_ratio:
-                # More benign than DDOS but not majority - yellow-green
-                intensity = (benign_ratio - ddos_ratio) * 2  # Scale the difference
-                return (0.6 - intensity * 0.2, 0.9, 0.3)
-            else:
-                # Perfectly balanced - yellow
-                return (0.9, 0.8, 0.3)
+        # Define base colors for interpolation
+        ddos_color = (0.9, 0.1, 0.1)    # Red for DDOS
+        benign_color = (0.1, 0.8, 0.1)  # Green for benign
+        
+        # Linear interpolation between colors based on proportions
+        # Each component (R, G, B) is calculated as weighted sum
+        r = ddos_ratio * ddos_color[0] + benign_ratio * benign_color[0]
+        
+        g = ddos_ratio * ddos_color[1] + benign_ratio * benign_color[1]
+        
+        b = ddos_ratio * ddos_color[2] + benign_ratio * benign_color[2]
+        
+        # Ensure color components are within valid range [0.0, 1.0]
+        r = max(0.0, min(1.0, r))
+        g = max(0.0, min(1.0, g))
+        b = max(0.0, min(1.0, b))
+        
+        return (r, g, b)
 
 
     def get_adaptive_spacing(self):
