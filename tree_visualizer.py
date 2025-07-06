@@ -1820,8 +1820,8 @@ class TreeVisualizer:
         return True
 
     def get_adaptive_font_size(self):
-        """Get font size that adapts to zoom level - îmbunătățit."""
-        # Calculează o dimensiune efectivă de font bazată pe zoom
+        """Get font size that adapts to zoom level - imbunatatit."""
+        # Calculeaza o dimensiune efectiva de font bazata pe zoom
         base_size = 12
         scaled_size = int(base_size * min(max(self.zoom, 0.3), 2.0))
         return max(scaled_size, 6)  # Minimum 6px
@@ -1867,7 +1867,7 @@ class TreeVisualizer:
     def draw_zoom_indicator(self):
         """Draw a zoom level indicator in the corner cu range extins pana la 3.0."""
         if self.zoom < 1.0:
-            return  # Nu afișa zoom indicator sub zoom 1.0
+            return  # Nu afisa zoom indicator sub zoom 1.0
             
         text_alpha = max(0.3, self.get_text_alpha())
         glColor4f(0.7, 0.7, 1.0, text_alpha)
