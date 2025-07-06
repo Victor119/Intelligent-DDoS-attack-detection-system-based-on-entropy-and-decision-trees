@@ -6,7 +6,7 @@ import random
 from datetime import datetime
 from pathlib import Path
 
-# Citirea globala a datasetului pentru a evita reîncărcarea repetată
+# Citirea globala a datasetului pentru a evita reincarcarea repetata
 global_df = None
 
 def initialize_dataset(dataset_path: Path):
@@ -64,14 +64,14 @@ def create_log_file(logs_dir: Path) -> Path:
         'SYN Flag Cnt', 'RST Flag Cnt', 'Bwd Pkts/s'
     ]
     
-    # Optimizare: folosește doar coloanele care există în dataset
+    # Optimizare: foloseste doar coloanele care exista in dataset
     existing_columns = [col for col in columns_to_drop if col in sampled.columns]
     filtered = sampled.drop(columns=existing_columns, errors='ignore')
 
     # Curata datele: elimina randurile cu NaN sau Inf
     filtered = filtered.replace([float('inf'), -float('inf')], pd.NA).dropna()
 
-    # Scrie în fisier cu separator virgula + spatiu
+    # Scrie in fisier cu separator virgula + spatiu
     with log_file.open('w', newline='', encoding='utf-8') as f:
         writer = csv.writer(f)
         for row in filtered.itertuples(index=False):
@@ -108,7 +108,7 @@ def main():
                 time.sleep(10 - elapsed_time)
             else:
                 print(f"Atentie: Generarea log-ului a durat {elapsed_time:.2f} secunde, mai mult de 10 secunde")
-                # Nu așteptăm deloc în acest caz și începem următoarea iterație imediat
+                # Nu asteptam deloc in acest caz si incepem urmatoarea iteratie imediat
             
     except KeyboardInterrupt:
         print("Oprit de utilizator.")
