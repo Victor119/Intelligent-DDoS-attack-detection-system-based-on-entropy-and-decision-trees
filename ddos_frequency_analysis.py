@@ -230,29 +230,29 @@ def highlight_tree_path_for_data_line(data_line, column_names):
 
 def process_data_file(file_path, column_names):
     """
-    Procesează un fișier .data și evidențiază calea pentru fiecare linie
+    Procesează un fisier .data si evidentiaza calea pentru fiecare linie
     """
     print(f"\n{'='*50}")
-    print(f"PROCESARE FIȘIER NOU: {file_path}")
+    print(f"PROCESARE FISIER NOU: {file_path}")
     print(f"{'='*50}")
     
     try:
         with open(file_path, 'r') as f:
             for line_number, line in enumerate(f, start=1):
                 line = line.strip()
-                if line:  # Verifică dacă linia nu este goală
+                if line:  # Verifica daca linia nu este goala
                     print(f"\nLinia {line_number}: {line}")
                     highlight_tree_path_for_data_line(line, column_names)
                     
-                    # Adaugă o pauză scurtă pentru a permite vizualizarea
+                    # Adauga o pauza scurta pentru a permite vizualizarea
                     time.sleep(0.5)
                     
     except Exception as e:
-        print(f"Eroare la procesarea fișierului {file_path}: {e}")
+        print(f"Eroare la procesarea fisierului {file_path}: {e}")
 
 class DataFileHandler(FileSystemEventHandler):
     """
-    Handler pentru monitorizarea fișierelor .data noi
+    Handler pentru monitorizarea fisierelor .data noi
     """
     def __init__(self, column_names, processed_files):
         self.column_names = column_names
@@ -262,55 +262,55 @@ class DataFileHandler(FileSystemEventHandler):
         if not event.is_directory and event.src_path.endswith('.data'):
             file_path = event.src_path
             
-            # Verifică dacă fișierul nu a fost deja procesat
+            # Verifica daca fisierul nu a fost deja procesat
             if file_path not in self.processed_files:
                 print(f"\n Fișier nou detectat: {file_path}")
                 
-                # Așteaptă puțin pentru ca fișierul să fie complet scris
+                # Asteapta putin pentru ca fisierul sa fie complet scris
                 time.sleep(1)
                 
-                # Procesează fișierul
+                # Proceseaza fisierul
                 process_data_file(file_path, self.column_names)
                 
-                # Marchează fișierul ca procesat
+                # Marcheaza fisierul ca procesat
                 self.processed_files.add(file_path)
     
     def on_modified(self, event):
-        # Dacă fișierul este modificat, îl procesăm din nou
+        # Daca fisierul este modificat, il procesam din nou
         if not event.is_directory and event.src_path.endswith('.data'):
             file_path = event.src_path
-            print(f"\n Fișier modificat detectat: {file_path}")
+            print(f"\n Fisier modificat detectat: {file_path}")
             
-            time.sleep(1)  # Așteaptă ca modificarea să fie completă
+            time.sleep(1)  # Asteapta ca modificarea sa fie completa
             process_data_file(file_path, self.column_names)
 
 def monitor_logs_folder(logs_dir, column_names):
     """
     Monitorizeaza folderul logs pentru fisiere .data noi
     """
-    # Set pentru a ține evidenta fișierelor deja procesate
+    # Set pentru a ține evidenta fisierelor deja procesate
     processed_files = set()
     
-    # Procesează fișierele existente
+    # Proceseaza fisierele existente
     existing_files = glob.glob(os.path.join(logs_dir, '*.data'))
     if existing_files:
-        print(f"\nFișiere existente găsite: {len(existing_files)}")
+        print(f"\nFisiere existente gasite: {len(existing_files)}")
         for file_path in existing_files:
             process_data_file(file_path, column_names)
             processed_files.add(file_path)
     else:
-        print("\nNu au fost găsite fișiere .data existente în folderul 'logs'.")
+        print("\nNu au fost găsite fisiere .data existente in folderul 'logs'.")
     
-    # Configurează monitorizarea pentru fișiere noi
+    # Configureaza monitorizarea pentru fisiere noi
     event_handler = DataFileHandler(column_names, processed_files)
     observer = Observer()
     observer.schedule(event_handler, logs_dir, recursive=False)
     
-    # Pornește monitorizarea
+    # Porneste monitorizarea
     observer.start()
-    print(f"\n Monitorizare activă pentru folderul: {logs_dir}")
-    print("Programul va procesa automat fișierele .data noi care apar...")
-    print("Apasă Ctrl+C pentru a opri monitorizarea.")
+    print(f"\n Monitorizare activa pentru folderul: {logs_dir}")
+    print("Programul va procesa automat fisierele .data noi care apar...")
+    print("Apasa Ctrl+C pentru a opri monitorizarea.")
     
     try:
         while True:
@@ -320,16 +320,16 @@ def monitor_logs_folder(logs_dir, column_names):
         observer.stop()
     
     observer.join()
-    print("Monitorizare oprită.")
+    print("Monitorizare oprita.")
 
 def optimize_tree_with_flag(tree_dict):
     """
-    Optimizează arborele în mod iterativ până când nu mai sunt posibile optimizări.
-    Folosește un flag pentru a detecta când s-au făcut modificări și repetă procesul
-    până când o parcurgere completă nu mai face nicio schimbare.
+    Optimizeaza arborele in mod iterativ pana cand nu mai sunt posibile optimizari.
+    Foloseste un flag pentru a detecta cand s-au facut modificari si repeta procesul
+    pana cand o parcurgere completa nu mai face nicio schimbare.
     
     Args:
-        tree_dict: Dicționarul care reprezintă arborele de decizie
+        tree_dict: Dictionarul care reprezinta arborele de decizie
         
     Returns:
         dict: Arborele complet optimizat
@@ -337,24 +337,24 @@ def optimize_tree_with_flag(tree_dict):
     
     def optimize_single_pass(tree, flag_ref):
         """
-        Funcție internă care face o singură parcurgere DFS și optimizează arborele.
+        Functie interna care face o singura parcurgere DFS si optimizeaza arborele.
         
         Args:
             tree: Arborele curent
-            flag_ref: Lista cu un element care conține flag-ul (pentru referință)
+            flag_ref: Lista cu un element care contine flag-ul (pentru referinta)
             
         Returns:
             dict: Arborele optimizat după o parcurgere
         """
-        # Dacă este un nod frunză, returnează-l așa cum este
+        # Daca este un nod frunza returnează-l asa cum este
         if 'Class' in tree:
             return tree
         
-        # Recursiv optimizează subarborii stâng și drept
+        # Recursiv optimizeaza subarborii stang si drept
         left_optimized = optimize_single_pass(tree['left'], flag_ref)
         right_optimized = optimize_single_pass(tree['right'], flag_ref)
         
-        # Verifică dacă ambele noduri copil sunt frunze cu aceeași clasă
+        # Verifica daca ambele noduri copil sunt frunze cu aceeasi clasa
         if ('Class' in left_optimized and 'Class' in right_optimized and 
             left_optimized['Class'] == right_optimized['Class']):
             
@@ -362,13 +362,13 @@ def optimize_tree_with_flag(tree_dict):
                   f"este inlocuit cu clasa '{left_optimized['Class']}' "
                   f"(ambele noduri copil aveau aceeasi clasa)")
             
-            # Setează flag-ul la 1 pentru a indica că s-a făcut o modificare
+            # Seteaza flag-ul la 1 pentru a indica ca s-a făcut o modificare
             flag_ref[0] = 1
             
-            # Returnează un nod frunză cu clasa comună
+            # Returneaza un nod frunza cu clasa comuna
             return {'Class': left_optimized['Class']}
         
-        # Altfel, returnează nodul cu subarborii optimizați
+        # Altfel, returneaza nodul cu subarborii optimizati
         return {
             'attribute': tree['attribute'],
             'split_value': tree['split_value'],
@@ -376,27 +376,27 @@ def optimize_tree_with_flag(tree_dict):
             'right': right_optimized
         }
     
-    # Inițializează flag-ul la 0
-    flag = [0]  # Folosim o listă pentru a putea modifica valoarea prin referință
+    # Initializeaza flag-ul la 0
+    flag = [0]  # Folosim o lista pentru a putea modifica valoarea prin referinta
     iteration = 0
     
     print(" INCEPE OPTIMIZAREA ITERATIVA A ARBORELUI")
     
-    # Continuă optimizarea până când flag-ul rămâne 0 după o parcurgere completă
+    # Continua optimizarea pana cand flag-ul ramane 0 dupa o parcurgere completa
     while True:
         iteration += 1
         print(f"\n ITERATIA {iteration}:")
         
-        # Resetează flag-ul la 0 la începutul fiecărei iterații
+        # Reseteaza flag-ul la 0 la inceputul fiecarei iteratii
         flag[0] = 0
         print(f"Flag resetat la: {flag[0]}")
         
-        # Efectuează o parcurgere DFS și optimizează
+        # Efectueaza o parcurgere DFS si optimizeaza
         tree_dict = optimize_single_pass(tree_dict, flag)
         
         print(f"Flag la sfarsitul iteratiei: {flag[0]}")
         
-        # Dacă flag-ul este încă 0, înseamnă că nu s-au făcut modificări
+        # Daca flag-ul este inca 0, inseamna ca nu s-au facut modificari
         if flag[0] == 0:
             print(f"\n OPTIMIZARE COMPLETA!")
             print(f"Numarul total de iteratii: {iteration}")
@@ -410,7 +410,7 @@ def optimize_tree_with_flag(tree_dict):
     return tree_dict
 
 if __name__ == '__main__':
-    path = r"C:\Users\victor\Documents\licenta_victor\varianta_ID3\DF.data"
+    path = r"C:\Users\victor\Documents\licenta_victor\varianta_ID3\dataset\train\train.csv"
     data = pd.read_csv(path, header=None)
     data.columns = ['Protocol', 'Tot Fwd Pkts', 'Tot Bwd Pkts', 'TotLen Fwd Pkts', 
                     'TotLen Bwd Pkts', 'Flow Byts/s', 'Flow Pkts/s', 
@@ -452,7 +452,7 @@ if __name__ == '__main__':
     
     logs_dir = r"C:/Users/victor/Documents/licenta_victor/varianta_ID3/logs"
     
-    # Pornește monitorizarea folderului logs
+    # Porneste monitorizarea folderului logs
     monitor_logs_folder(logs_dir, data.columns.tolist())
     
     print("All threads complete. Exiting main program.")
