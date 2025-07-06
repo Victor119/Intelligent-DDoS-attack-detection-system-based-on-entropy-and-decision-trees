@@ -66,8 +66,6 @@ def build_H(frequency_table: pd.DataFrame, col: str):
     # Extragem lista de valori unice din coloana specificata
     values = frequency_table[col].unique().tolist()
     
-    #print("values", values)
-    
     # Numarim aparitiile pentru fiecare valoare in functie de clasa
     value_counts = {}
     for value in values:
@@ -94,6 +92,7 @@ def process_columns(f_table: pd.DataFrame, exclude_cols=None):
         print("\n======================")
         print(f"Prelucrare coloana: {col}")
         H, counts_dict, unique_vals = build_H(f_table, col)
+        
         
         # Salvam structura H initiala
         saved_H = list(H[0])
@@ -323,6 +322,92 @@ def monitor_logs_folder(logs_dir, column_names):
     observer.join()
     print("Monitorizare oprită.")
 
+def optimize_tree_with_flag(tree_dict):
+    """
+    Optimizează arborele în mod iterativ până când nu mai sunt posibile optimizări.
+    Folosește un flag pentru a detecta când s-au făcut modificări și repetă procesul
+    până când o parcurgere completă nu mai face nicio schimbare.
+    
+    Args:
+        tree_dict: Dicționarul care reprezintă arborele de decizie
+        
+    Returns:
+        dict: Arborele complet optimizat
+    """
+    
+    def optimize_single_pass(tree, flag_ref):
+        """
+        Funcție internă care face o singură parcurgere DFS și optimizează arborele.
+        
+        Args:
+            tree: Arborele curent
+            flag_ref: Lista cu un element care conține flag-ul (pentru referință)
+            
+        Returns:
+            dict: Arborele optimizat după o parcurgere
+        """
+        # Dacă este un nod frunză, returnează-l așa cum este
+        if 'Class' in tree:
+            return tree
+        
+        # Recursiv optimizează subarborii stâng și drept
+        left_optimized = optimize_single_pass(tree['left'], flag_ref)
+        right_optimized = optimize_single_pass(tree['right'], flag_ref)
+        
+        # Verifică dacă ambele noduri copil sunt frunze cu aceeași clasă
+        if ('Class' in left_optimized and 'Class' in right_optimized and 
+            left_optimized['Class'] == right_optimized['Class']):
+            
+            print(f" Optimizare gasita: Nodul cu atributul '{tree['attribute']}' si split-ul '{tree['split_value']}' "
+                  f"este inlocuit cu clasa '{left_optimized['Class']}' "
+                  f"(ambele noduri copil aveau aceeasi clasa)")
+            
+            # Setează flag-ul la 1 pentru a indica că s-a făcut o modificare
+            flag_ref[0] = 1
+            
+            # Returnează un nod frunză cu clasa comună
+            return {'Class': left_optimized['Class']}
+        
+        # Altfel, returnează nodul cu subarborii optimizați
+        return {
+            'attribute': tree['attribute'],
+            'split_value': tree['split_value'],
+            'left': left_optimized,
+            'right': right_optimized
+        }
+    
+    # Inițializează flag-ul la 0
+    flag = [0]  # Folosim o listă pentru a putea modifica valoarea prin referință
+    iteration = 0
+    
+    print(" INCEPE OPTIMIZAREA ITERATIVA A ARBORELUI")
+    
+    # Continuă optimizarea până când flag-ul rămâne 0 după o parcurgere completă
+    while True:
+        iteration += 1
+        print(f"\n ITERATIA {iteration}:")
+        
+        # Resetează flag-ul la 0 la începutul fiecărei iterații
+        flag[0] = 0
+        print(f"Flag resetat la: {flag[0]}")
+        
+        # Efectuează o parcurgere DFS și optimizează
+        tree_dict = optimize_single_pass(tree_dict, flag)
+        
+        print(f"Flag la sfarsitul iteratiei: {flag[0]}")
+        
+        # Dacă flag-ul este încă 0, înseamnă că nu s-au făcut modificări
+        if flag[0] == 0:
+            print(f"\n OPTIMIZARE COMPLETA!")
+            print(f"Numarul total de iteratii: {iteration}")
+            print(f"Nu mai sunt posibile optimizari suplimentare")
+            break
+        else:
+            print(f"S-au gasit optimizari - continua cu urmatoarea iteratie...")
+    
+    print(" ARBORELE A FOST COMPLET OPTIMIZAT!")
+
+    return tree_dict
 
 if __name__ == '__main__':
     path = r"C:\Users\victor\Documents\licenta_victor\varianta_ID3\DF.data"
@@ -339,6 +424,8 @@ if __name__ == '__main__':
     
     max_depth = len(data.columns) - 1
     tree_dict = build_binary_decision_tree(data, max_depth=max_depth, min_samples=1)
+    
+    tree_dict = optimize_tree_with_flag(tree_dict)
     
     root = binary_to_anytree(tree_dict)
     for pre, _, node in RenderTree(root):

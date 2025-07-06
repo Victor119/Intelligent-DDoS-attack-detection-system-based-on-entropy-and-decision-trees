@@ -6,7 +6,7 @@ import random
 from datetime import datetime
 from pathlib import Path
 
-# Citirea globală a datasetului pentru a evita reîncărcarea repetată
+# Citirea globala a datasetului pentru a evita reîncărcarea repetată
 global_df = None
 
 def initialize_dataset(dataset_path: Path):
@@ -38,7 +38,7 @@ def create_log_file(logs_dir: Path) -> Path:
     if global_df is None:
         raise ValueError("Datasetul global nu a fost initializat")
     
-    # Numar aleatoriu de randuri intre 50 si 200
+    # Numar aleatoriu de randuri intre 10 si 20
     num_rows = random.randint(10, 20)
     
     # Esantionare fara inlocuire
@@ -89,7 +89,7 @@ def create_log_file(logs_dir: Path) -> Path:
 def main():
     # Ajusteaza aceste cai dupa cum este necesar
     base_dir = Path(r"C:/Users/victor/Documents/licenta_victor/varianta_ID3")
-    dataset_path = Path("C:\\Users\\victor\\Documents\\licenta_victor\\varianta_ID3\\dataset\\train\\train.csv")
+    dataset_path = Path("C:\\Users\\victor\\Documents\\licenta_victor\\varianta_ID3\\dataset\\test\\test.csv")
     logs_dir = base_dir / "logs"
 
     initialize_dataset(dataset_path)

@@ -38,6 +38,41 @@ if __name__ == "__main__":
     # --- CREATE TRAIN SET ---
     # Read header and sample slices
     header_orig = pd.read_csv(base + r"\final_dataset.csv", sep=",", header=None, nrows=1, low_memory=False)
+    
+    df_full = pd.read_csv(base + r"\final_dataset.csv", sep=",", low_memory=False)
+    
+    # Assume the last column is the label column
+    label_column = df_full.columns[-1]
+    
+    # Extract 30000 random rows with 'ddos' label
+    print("Extracting DDOS samples...")
+    ddos_rows = df_full[df_full[label_column].str.lower().str.contains('ddos', na=False)]
+    
+    if len(ddos_rows) >= 30000:
+        ddos_sample = ddos_rows.sample(n=30000, random_state=42)
+    else:
+        ddos_sample = ddos_rows
+        #print(f"Warning: Only {len(ddos_rows)} DDOS rows available, using all of them.")
+    
+    # Save DDOS samples (without header)
+    ddos_sample.to_csv(base + r"\sheet_ddos.txt", sep=",", index=False, header=False)
+    print(f"DDOS samples saved: {len(ddos_sample)} rows")
+    
+    # Extract 30000 random rows with 'Benign' label
+    print("Extracting Benign samples...")
+    benign_rows = df_full[df_full[label_column].str.lower().str.contains('benign', na=False)]
+    #print(f"Total Benign rows found: {len(benign_rows)}")
+    
+    if len(benign_rows) >= 30000:
+        benign_sample = benign_rows.sample(n=30000, random_state=42)
+    else:
+        benign_sample = benign_rows
+        #print(f"Warning: Only {len(benign_rows)} Benign rows available, using all of them.")
+    
+    # Save Benign samples (without header)
+    benign_sample.to_csv(base + r"\sheet_not_ddos.txt", sep=",", index=False, header=False)
+    print(f"Benign samples saved: {len(benign_sample)} rows")
+    
     ddos_data    = pd.read_csv(base + r"\sheet_ddos.txt", sep=",", header=None, skiprows=1, nrows=10000, low_memory=False)
     not_ddos     = pd.read_csv(base + r"\sheet_not_ddos.txt", sep=",", header=None, nrows=10000, low_memory=False)
     
@@ -69,3 +104,5 @@ if __name__ == "__main__":
     # ** sTERGEM PRIMUL RaND (header-ul) **
     test_clean = test_clean.iloc[1:].reset_index(drop=True)
     test_clean.to_csv(test_csv_path, sep=",", header=False, index=False, quoting=csv.QUOTE_NONE)
+
+    print("Sample extraction completed!")
