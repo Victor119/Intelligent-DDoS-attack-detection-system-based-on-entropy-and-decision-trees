@@ -16,6 +16,12 @@ from watchdog.events import FileSystemEventHandler
 
 from tree_visualizer import visualize_binary_tree, highlight_path_for_data_line
 
+#from .metrics 
+
+import sklearn.metrics
+
+#accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
+
 def calculate_entropy(a, b):
     n = a
     m = b
@@ -359,8 +365,8 @@ def optimize_tree_with_flag(tree_dict):
             left_optimized['Class'] == right_optimized['Class']):
             
             print(f" Optimizare gasita: Nodul cu atributul '{tree['attribute']}' si split-ul '{tree['split_value']}' "
-                  f"este inlocuit cu clasa '{left_optimized['Class']}' "
-                  f"(ambele noduri copil aveau aceeasi clasa)")
+                f"este inlocuit cu clasa '{left_optimized['Class']}' "
+                f"(ambele noduri copil aveau aceeasi clasa)")
             
             # Seteaza flag-ul la 1 pentru a indica ca s-a făcut o modificare
             flag_ref[0] = 1
@@ -409,6 +415,100 @@ def optimize_tree_with_flag(tree_dict):
 
     return tree_dict
 
+def predict(tree, row):
+    """
+    Funcție pentru a face o predicție folosind arborele de decizie
+    pentru o singură linie de date
+    """
+    if 'Class' in tree:
+        return tree['Class']
+    
+    attr = tree['attribute']
+    split_val = tree['split_value']
+    
+    # Obține valoarea din rând pentru atributul curent
+    value = row[attr]
+    
+    # Verifică tipul de split (numeric sau categoric)
+    if isinstance(split_val, (int, float)):
+        try:
+            # Încearcă conversia la float pentru comparație numerică
+            value = float(value)
+            if value <= split_val:
+                return predict(tree['left'], row)
+            else:
+                return predict(tree['right'], row)
+        except ValueError:
+            # Dacă conversia eșuează, folosește ramura dreaptă
+            return predict(tree['right'], row)
+    else:
+        # Split categoric
+        if str(value) == str(split_val):
+            return predict(tree['left'], row)
+        else:
+            return predict(tree['right'], row)
+
+
+# Variabile globale pentru colectarea datelor de evaluare
+y_true_global = []
+y_pred_global = []
+
+def process_data_file(file_path, column_names):
+    """Procesează un fișier .data și adaugă etichetele + predicțiile pentru evaluare"""
+    print(f"\n{'='*50}")
+    print(f"PROCESARE FIȘIER NOU: {file_path}")
+    print(f"{'='*50}")
+
+    try:
+        with open(file_path, 'r') as f:
+            for line_number, line in enumerate(f, start=1):
+                line = line.strip()
+                if line:
+                    print(f"\nLinia {line_number}: {line}")
+                    
+                    # Parsează valorile și construiește un dict pentru predicție
+                    values = [val.strip() for val in line.split(',')]
+                    row_dict = dict(zip(column_names, values))
+                    
+                    # Adaugă eticheta reală și predicția
+                    if 'Class' in row_dict:
+                        y_true_global.append(row_dict['Class'].lower())
+                        pred = predict(tree_dict, row_dict)
+                        y_pred_global.append(pred)
+                    
+                    # Evidentiaza calea in vizualizare
+                    highlight_tree_path_for_data_line(line, column_names)
+
+                    time.sleep(0.5)
+
+    except Exception as e:
+        print(f"Eroare la procesarea fisierului {file_path}: {e}")
+
+
+def evaluate_global_metrics():
+    """Evalueaza metricile globale pe toate fisierele procesate"""
+    if not y_true_global:
+        print("\nNu exista date procesate din loguri pentru evaluare.")
+        return
+
+    accuracy = sklearn.metrics.accuracy_score(y_true_global, y_pred_global)
+    precision = sklearn.metrics.precision_score(y_true_global, y_pred_global, pos_label='ddos')
+    recall = sklearn.metrics.recall_score(y_true_global, y_pred_global, pos_label='ddos')
+    f1 = sklearn.metrics.f1_score(y_true_global, y_pred_global, pos_label='ddos')
+    cm = sklearn.metrics.confusion_matrix(y_true_global, y_pred_global, labels=['benign', 'ddos'])
+
+    print("\n" + "="*50)
+    print("EVALUAREA PERFORMANTEI ARBORELUI (Date din loguri)")
+    print("="*50)
+    print(f"Acuratete: {accuracy:.4f}")
+    print(f"Precizie (ddos): {precision:.4f}")
+    print(f"Recall (ddos): {recall:.4f}")
+    print(f"F1-Score (ddos): {f1:.4f}")
+    print("Matrice de confuzie:")
+    print("    [ TN, FP ]")
+    print("    [ FN, TP ]")
+    print(cm)
+
 if __name__ == '__main__':
     path = r"C:\Users\victor\Documents\licenta_victor\varianta_ID3\dataset\train\train.csv"
     data = pd.read_csv(path, header=None)
@@ -419,8 +519,10 @@ if __name__ == '__main__':
     
     for col in data.columns:
         if col != 'Class':
-            try: data[col] = pd.to_numeric(data[col])
-            except: pass
+            try: 
+                data[col] = pd.to_numeric(data[col])
+            except: 
+                pass
     
     max_depth = len(data.columns) - 1
     tree_dict = build_binary_decision_tree(data, max_depth=max_depth, min_samples=1)
@@ -451,8 +553,9 @@ if __name__ == '__main__':
     print("This will print immediately after launching visualization thread.")
     
     logs_dir = r"C:/Users/victor/Documents/licenta_victor/varianta_ID3/logs"
-    
-    # Porneste monitorizarea folderului logs
-    monitor_logs_folder(logs_dir, data.columns.tolist())
-    
-    print("All threads complete. Exiting main program.")
+    try:
+        monitor_logs_folder(logs_dir, data.columns.tolist())
+    except KeyboardInterrupt:
+        print("\nMonitorizare oprita. Calculam metricile finale...")
+        evaluate_global_metrics()
+        print("Program incheiat.")
