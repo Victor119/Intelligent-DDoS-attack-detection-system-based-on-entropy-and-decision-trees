@@ -15,6 +15,7 @@ if __name__ == "__main__":
     base = r"C:\Users\victor\Documents\licenta_victor\varianta_ID3"
     train_csv_path = base + r"\dataset\train\train.csv"
     test_csv_path  = base + r"\dataset\test\test.csv"
+    val_csv_path   = base + r"\dataset\validation\validation.csv"
     
     columns_to_drop = [
         'Flow ID', 'Src IP', 'Src Port','Dst IP','Dst Port', 'Timestamp', 'Flow Duration', 'Fwd Pkt Len Max', 'Fwd Pkt Len Min', 
@@ -105,4 +106,12 @@ if __name__ == "__main__":
     test_clean = test_clean.iloc[1:].reset_index(drop=True)
     test_clean.to_csv(test_csv_path, sep=",", header=False, index=False, quoting=csv.QUOTE_NONE)
 
-    print("Sample extraction completed!")
+    # --- CREATE VALIDATION SET ---
+    sampled_val = data_f.sample(n=min(20000, len(data_f)), random_state=99).reset_index(drop=True)
+    combined_v  = pd.concat([header_f, sampled_val], ignore_index=True)
+    header_row_v = combined_v.iloc[0]
+    val_clean   = drop_and_format(combined_v, header_row_v, columns_to_drop)
+    val_clean = val_clean.iloc[1:].reset_index(drop=True)
+    val_clean.to_csv(val_csv_path, sep=",", header=False, index=False, quoting=csv.QUOTE_NONE)
+
+    print("Sample extraction completed! Train, Test, and Validation sets created.")
